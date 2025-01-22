@@ -69,3 +69,43 @@ pulsar2 build --input output_onnx/unet_sim_cut.onnx --config unet_u16.json --out
 ```
 pulsar2 build --input output_onnx/sd15_vae_decoder_sim.onnx --config vae_u16.json --output_dir output_vae --output_name vae.axmodel
 ```
+
+## Inpainting 模型转换
+
+## 导出模型（Huggingface -> ONNX）
+
+```
+huggingface-cli download --resume-download runwayml/stable-diffusion-inpainting --local-dir runwayml/stable-diffusion-inpainting
+```
+
+运行脚本 `sd15_inpaint_export_onnx.py` 导出 unet / vae encoder / vae decoder 的 onnx 模型
+```
+python sd15_inpaint_export_onnx.py --input_path runwayml/stable-diffusion-inpainting --input_lora_path latent-consistency/lcm-lora-sdv1-5/ --output_path output_onnx_inpaint/
+```
+验证导出的ONNX是否正确，运行`run_inpaint_onnx.py`，会保存一张png图片，用来验证ONNX是否正确
+```
+python run_inpaint_onnx.py
+```
+
+## 生成量化数据集, Calibration 数据集在inpaint_samples中
+```
+python sd15_inpaint_lora_prepare_data.py
+```
+
+## 模型转换
+**unet**
+```
+pulsar2 build --input output_onnx_inpaint/unet_sim_cut.onnx --config unet_u16.json --output_dir output_unet_inpaint --output_name unet.axmodel
+```
+
+**vae encoder**
+```
+# 修改 vae_u16.json 中的 calibration_dataset 指向的路径
+pulsar2 build --input output_onnx_inpaint/sd15_vae_encoder_sim.onnx --config vae_u16.json --output_dir output_vae_encoder_inpaint --output_name vae_encoder.axmodel
+```
+
+**vae decoder**
+```
+pulsar2 build --input output_onnx_inpaint/sd15_vae_decoder_sim.onnx --config vae_u16.json --output_dir output_vae_decoder_inpaint --output_name vae_decoder.axmodel
+```
+

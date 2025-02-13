@@ -109,3 +109,19 @@ pulsar2 build --input output_onnx_inpaint/sd15_vae_encoder_sim.onnx --config vae
 pulsar2 build --input output_onnx_inpaint/sd15_vae_decoder_sim.onnx --config vae_u16.json --output_dir output_vae_decoder_inpaint --output_name vae_decoder.axmodel
 ```
 
+## ControlNet 模型转换
+```
+huggingface-cli download --resume-download lllyasviel/sd-controlnet-canny --local-dir lllyasviel/sd-controlnet-canny
+huggingface-cli download --resume-download runwayml/stable-diffusion-v1-5 --local-dir runwayml/stable-diffusion-v1-5
+```
+
+运行脚本 `sd15_controlnet_export_onnx.py` 导出 unet / vae encoder / vae decoder / controlnet 的 onnx 模型
+```
+python sd15_controlnet_export_onnx.py --input_path runwayml/stable-diffusion-v1-5 --input_lora_path latent-consistency/lcm-lora-sdv1-5/ --input_controlnet_path lllyasviel/sd-controlnet-canny --output_path output_onnx_controlnet
+```
+验证导出的onnx是否正确，运行`run_controlnet_onnx.py`，会保存一张png图片，用来验证ONNX是否正确.
+
+把 unet 和 controlnet 提前计算好的 time_embedding 的npy文件copy 到models/controlnet/
+```
+python run_controlnet_onnx.py 
+```

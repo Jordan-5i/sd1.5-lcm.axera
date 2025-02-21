@@ -92,7 +92,7 @@ python run_inpaint_onnx.py
 python sd15_inpaint_lora_prepare_data.py
 ```
 
-## 模型转换
+## 模型编译
 **unet**
 ```
 pulsar2 build --input output_onnx_inpaint/unet_sim_cut.onnx --config unet_u16.json --output_dir output_unet_inpaint --output_name unet.axmodel
@@ -115,7 +115,7 @@ huggingface-cli download --resume-download lllyasviel/sd-controlnet-canny --loca
 huggingface-cli download --resume-download runwayml/stable-diffusion-v1-5 --local-dir runwayml/stable-diffusion-v1-5
 ```
 
-运行脚本 `sd15_controlnet_export_onnx.py` 导出 unet / vae encoder / vae decoder / controlnet 的 onnx 模型
+运行脚本 `sd15_controlnet_export_onnx.py` 导出 unet / vae decoder / controlnet 的 onnx 模型
 ```
 python sd15_controlnet_export_onnx.py --input_path runwayml/stable-diffusion-v1-5 --input_lora_path latent-consistency/lcm-lora-sdv1-5/ --input_controlnet_path lllyasviel/sd-controlnet-canny --output_path output_onnx_controlnet
 ```
@@ -124,4 +124,21 @@ python sd15_controlnet_export_onnx.py --input_path runwayml/stable-diffusion-v1-
 把 unet 和 controlnet 提前计算好的 time_embedding 的npy文件copy 到models/controlnet/
 ```
 python run_controlnet_onnx.py 
+```
+准备unet / vae decoder / controlnet 校准数据集，运行`sd15_controlnet_lora_prepare_data.py`
+
+## 模型编译
+**unet**
+```
+pulsar2 build --input output_onnx_controlnet/unet_sim_cut.onnx --config unet_u16.json --output_dir output_unet_controlnet --output_name unet.axmodel
+```
+
+**vae decoder**
+```
+pulsar2 build --input output_onnx_controlnet/sd15_vae_decoder_sim.onnx --config vae_u16.json --output_dir output_vae_decoder_controlnet --output_name vae_decoder.axmodel
+```
+
+**controlnet**
+```
+pulsar2 build --input output_onnx_controlnet/controlnet_sim_cut.onnx --config controlnet_u16.json --output_dir output_controlnet --output_name controlnet.axmodel
 ```

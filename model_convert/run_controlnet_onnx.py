@@ -175,7 +175,7 @@ if __name__ == '__main__':
                                                                     "/down_blocks.0/resnets.0/act_1/Mul_output_0": np.stack([time_input_controlnet[i], time_input_controlnet[i]], axis=0), \
                                                                     "encoder_hidden_states": controlnet_prompt_embeds,
                                                                     "controlnet_cond": image.detach().numpy(),
-                                                                    "conditioning_scale": np.array(0.8)})
+                                                                    "conditioning_scale": np.array([0.8])})
 
         unet_start = time.time()
         down_block_additional_residuals_args = {f"down_block_additional_residuals_{_}": down_block_res_samples[_] for _ in range(12)}

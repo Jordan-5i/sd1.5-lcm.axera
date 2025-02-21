@@ -218,7 +218,7 @@ def extract_controlnet(input_path, output_path):
         "t": torch.from_numpy(np.array(1, dtype=np.int64)),
         "encoder_hidden_states": torch.rand([2, 77, 768], dtype=torch.float32),
         "controlnet_cond": torch.rand([2, 3, 512, 512], dtype=torch.float32), 
-        "conditioning_scale": 0.8,
+        "conditioning_scale": torch.tensor([0.8], dtype=torch.float32),
     }
 
     controlnet_path = pathlib.Path(output_path) / "controlnet"
